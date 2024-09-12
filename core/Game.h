@@ -48,9 +48,12 @@ private:
 	unsigned int score = 0;
 
 	bool changeAliensDirection = false;
-	int destroyedAliensCount = 0;
+	bool initializingLevel = true, shouldRender = true;
+	int destroyedAliensCount = 0, renderCycles = 0;
 
 	float mysteryShipSpawnerTimer = 0.f;
+
+	float elapsedTime = .0f;
 
 	void setupSpriteAtlas();
 public:
@@ -58,7 +61,7 @@ public:
 	Game(int width, int height, const char* title);
 	~Game();
 	void run();
-	void update();
+	void update(float deltaTime);
 	void render();
 	void processEvents();
 	void initializeText();
@@ -72,4 +75,6 @@ public:
 	void updateScore(int entityScore);
 	float calculateAliensSpeed(int currentAliensCount);
 	void spawnMysteryShip(float deltaTime);
+	void reset();
+	void initializeLevel(float deltaTime);
 };

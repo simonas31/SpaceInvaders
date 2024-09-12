@@ -75,15 +75,25 @@ Game::~Game() {}
 void Game::run()
 {
 	while (window->isOpen()) {
-		processEvents();
-		update();
-		render();
+		float deltaTime = clock.restart().asSeconds();
+		if (initializingLevel) {
+			initializeLevel(deltaTime);
+		}
+		else {
+			processEvents();
+			update(deltaTime);
+			render();
+		}
+
+		if (aliens.empty()) {
+			setupLevel();
+			reset();
+		}
 	}
 }
 
-void Game::update()
+void Game::update(float deltaTime)
 {
-	float deltaTime = clock.restart().asSeconds();
 	// IF GAME OVER THEN DISPLAY GAME OVER TEXT, SAVE SCORE AND GO TO DASHBOARD
 	if (player->getLives() == 0) {
 		gameOver = true;
@@ -210,6 +220,9 @@ void Game::initializeText()
 
 void Game::setupLevel()
 {
+	playerProjectiles = std::vector<Projectile*>();
+	alienProjectiles = std::vector<Projectile*>();
+
 	// Add Player
 	player = new Player(sf::Vector2f((float)window_W / 2, (float)window_H - 50), &atlas);
 
@@ -243,7 +256,13 @@ void Game::setupLevel()
 		}
 	}
 
-	mysteryShip = nullptr;
+	if (mysteryShip) {
+		delete mysteryShip;
+		mysteryShip = nullptr;
+	}
+	else {
+		mysteryShip = nullptr;
+	}
 }
 
 void Game::updateWalls(float deltaTime)
@@ -348,7 +367,7 @@ void Game::updateProjectiles(float deltaTime)
 void Game::updateMysteryShip(float deltaTime)
 {
 	if (mysteryShip) {  // Check if mysteryShip is not nullptr
-		if (mysteryShip->getPosition().x >= -50.f) {
+		if (mysteryShip->getPosition().x >= -50.f && mysteryShip->isAlive()) {
 			mysteryShip->update(deltaTime);
 		}
 		else {
@@ -473,5 +492,41 @@ void Game::spawnMysteryShip(float deltaTime)
 	}
 	else {
 		mysteryShipSpawnerTimer = .0f;
+	}
+}
+
+void Game::reset()
+{
+	elapsedTime = 0.f;
+	shouldRender = true;
+	renderCycles = 0;
+	initializingLevel = true;
+}
+
+void Game::initializeLevel(float deltaTime)
+{
+	elapsedTime += deltaTime;
+
+	if (initializingLevel) {
+		if (elapsedTime >= 0.5f) {
+			elapsedTime = 0.f;
+
+			if (shouldRender) {
+				render();
+			}
+			else {
+				window->clear();
+				window->display();
+			}
+
+			shouldRender = !shouldRender;
+			if (!shouldRender) {
+				renderCycles++;
+			}
+
+			if (renderCycles >= 3) {
+				initializingLevel = false;
+			}
+		}
 	}
 }
