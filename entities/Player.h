@@ -4,6 +4,7 @@
 #include <functional>
 #include "../core/ProjectileFactory.h"
 #include "../core/SpriteAtlas.h"
+#include "../core/SoundBufferManager.h"
 
 class Player : public Entity
 {

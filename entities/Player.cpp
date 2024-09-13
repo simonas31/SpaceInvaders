@@ -14,11 +14,8 @@ Player::Player(sf::Vector2f position, SpriteAtlas* atlas)
 	deathAnimation.addFrame(atlas->createSprite("entity_death_1").getTextureRect());
 	deathAnimation.addFrame(atlas->createSprite("entity_death_2").getTextureRect());
 
-	shootBuffer.loadFromFile("assets/sounds/shoot.wav");
-	deathBuffer.loadFromFile("assets/sounds/player_explosion.wav");
-
-	shootSound.setBuffer(shootBuffer);
-	deathSound.setBuffer(deathBuffer);
+	shootSound.setBuffer(SoundBufferManager::getSoundBuffer("assets/sounds/shoot.wav"));
+	deathSound.setBuffer(SoundBufferManager::getSoundBuffer("assets/sounds/player_explosion.wav"));
 
 	shootCooldown = .5f;
 	shootTimer = .5f;

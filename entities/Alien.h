@@ -3,6 +3,7 @@
 #include <functional>
 #include "../core/ProjectileFactory.h"
 #include "../core/AlienType.cpp"
+#include "../core/SoundBufferManager.h"
 
 #define FRAME_TIME .5f
 

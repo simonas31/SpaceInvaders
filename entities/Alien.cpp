@@ -19,12 +19,8 @@ Alien::Alien(const struct AlienType& alienType, sf::Vector2f pos, SpriteAtlas* a
 	deathAnimation.addFrame(atlas->createSprite("entity_death_1").getTextureRect());
 	deathAnimation.addFrame(atlas->createSprite("entity_death_2").getTextureRect());
 
-
-	shootBuffer.loadFromFile("assets/sounds/shoot.wav");
-	deathBuffer.loadFromFile("assets/sounds/alien_explosion.wav");
-
-	shootSound.setBuffer(shootBuffer);
-	deathSound.setBuffer(deathBuffer);
+	shootSound.setBuffer(SoundBufferManager::getSoundBuffer("assets/sounds/shoot.wav"));
+	deathSound.setBuffer(SoundBufferManager::getSoundBuffer("assets/sounds/alien_explosion.wav"));
 
 	sprite.setPosition(pos);
 	speed = 100.f;
@@ -40,7 +36,7 @@ void Alien::update(float deltaTime)
 
 		// animation based movement
 		if (movementTimer >= FRAME_TIME / speedFactor) {
-			animation.update(4.f, sprite);
+			animation.update(4.f, sprite, true);
 
 			sf::Vector2f movement(0.f, 0.f);
 			// if changing direction then go down

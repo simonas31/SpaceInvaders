@@ -15,11 +15,8 @@ MysteryShip::MysteryShip(sf::Vector2f position, SpriteAtlas* atlas)
 	deathAnimation.addFrame(atlas->createSprite("entity_death_1").getTextureRect());
 	deathAnimation.addFrame(atlas->createSprite("entity_death_2").getTextureRect());
 
-	movementBuffer.loadFromFile("assets/sounds/mystery_ship_movement.wav");
-	deathBuffer.loadFromFile("assets/sounds/alien_explosion.wav");
-
-	movementSound.setBuffer(movementBuffer);
-	deathSound.setBuffer(deathBuffer);
+	movementSound.setBuffer(SoundBufferManager::getSoundBuffer("assets/sounds/mystery_ship_movement.wav"));
+	deathSound.setBuffer(SoundBufferManager::getSoundBuffer("assets/sounds/alien_explosion.wav"));
 	movementSound.setLoop(true);
 	movementSound.play();
 
@@ -71,4 +68,9 @@ void MysteryShip::explode()
 {
 	lives--;
 	exploding = true;
+}
+
+void MysteryShip::stopSounds()
+{
+	movementSound.stop();
 }

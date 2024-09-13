@@ -1,5 +1,6 @@
 #pragma once
 #include "Entity.cpp"
+#include "../core/SoundBufferManager.h"
 
 class MysteryShip :
     public Entity
@@ -12,5 +13,6 @@ public:
 	void render(sf::RenderWindow& window);
 	void shoot(std::function<void(Projectile*)> push_projectile);
 	void explode();
+	void stopSounds();
 };
 

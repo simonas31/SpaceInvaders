@@ -51,6 +51,9 @@
     <ClCompile Include="entities\MysteryShip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\SoundBufferManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Game.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entities\MysteryShip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\SoundBufferManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

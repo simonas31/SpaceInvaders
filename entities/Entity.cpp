@@ -22,9 +22,6 @@ protected:
 	bool playDeathSoundOnce = true;
 
 	SpriteAtlas* atlas;
-	sf::SoundBuffer movementBuffer;
-	sf::SoundBuffer shootBuffer;
-	sf::SoundBuffer deathBuffer;
 	sf::Sound movementSound;
 	sf::Sound shootSound;
 	sf::Sound deathSound;

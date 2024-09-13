@@ -77,4 +77,6 @@ public:
 	void spawnMysteryShip(float deltaTime);
 	void reset();
 	void initializeLevel(float deltaTime);
+	bool clickedRestart();
+	sf::RectangleShape createTextBorder(sf::FloatRect bounds, sf::Color borderColor, float borderWidth);
 };

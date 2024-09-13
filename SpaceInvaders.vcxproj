@@ -138,6 +138,7 @@
     <ClCompile Include="entities\Wall.cpp" />
     <ClCompile Include="entities\MysteryShip.cpp" />
     <ClCompile Include="projectiles\Projectile.cpp" />
+    <ClCompile Include="core\SoundBufferManager.cpp" />
     <ClCompile Include="SpaceInvaders.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="entities\Wall.h" />
     <ClInclude Include="entities\MysteryShip.h" />
     <ClInclude Include="projectiles\Projectile.h" />
+    <ClInclude Include="core\SoundBufferManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\fonts\space_invaders.ttf">

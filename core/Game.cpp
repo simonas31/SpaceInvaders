@@ -97,6 +97,16 @@ void Game::update(float deltaTime)
 	// IF GAME OVER THEN DISPLAY GAME OVER TEXT, SAVE SCORE AND GO TO DASHBOARD
 	if (player->getLives() == 0) {
 		gameOver = true;
+		if (mysteryShip)
+			mysteryShip->stopSounds();
+	}
+
+	if (gameOver && clickedRestart()) {
+		score = 0;
+		updateScore(score);
+		setupLevel();
+		gameOver = false;
+		reset();
 	}
 
 	if (gameOver || player->isExploding()) {
@@ -126,6 +136,15 @@ void Game::render()
 {
 	window->clear();
 
+	//draw rect when user hovers text "RESTART"
+	if (gameOver) {
+		sf::FloatRect textBounds = texts["restart_text"]->getGlobalBounds();
+		if (textBounds.contains((sf::Vector2f)sf::Mouse::getPosition(*window))) {
+			sf::RectangleShape rect = createTextBorder(textBounds, sf::Color::White, 3.f);
+			window->draw(rect);
+		}
+	}
+
 	// render walls
 	for (Wall* wall : walls) {
 		wall->render(*window);
@@ -146,24 +165,30 @@ void Game::render()
 	}
 
 	// render text;
-	std::map<std::string, sf::Text*>::iterator itr;
-	for (itr = texts.begin(); itr != texts.end(); ++itr) {
-		if (paused && itr->first == "paused")
-			itr->second->setFillColor(sf::Color::Green);
-		else if (!paused && itr->first == "paused")
-			itr->second->setFillColor(sf::Color::Transparent);
+	for (auto itr = texts.begin(); itr != texts.end(); ++itr) {
+		const std::string& key = itr->first;
+		sf::Text* text = itr->second;
 
-		if (gameOver && itr->first == "game_over")
-			itr->second->setFillColor(sf::Color::Red);
-		else if (!gameOver && itr->first == "game_over")
-			itr->second->setFillColor(sf::Color::Transparent);
-		window->draw(*itr->second);
+		if (key == "paused") {
+			text->setFillColor(paused ? sf::Color::Green : sf::Color::Transparent);
+		}
+		else if (key == "game_over") {
+			text->setFillColor(gameOver ? sf::Color::Red : sf::Color::Transparent);
+		}
+		else if (key == "restart_text") {
+			text->setFillColor(gameOver ? sf::Color::White : sf::Color::Transparent);
+		}
+
+		// Draw the text if its not transparent
+		if (text->getFillColor() != sf::Color::Transparent) {
+			window->draw(*text);
+		}
 	}
 
 	// render lives
 	sf::Sprite sp = player->getSprite();
 	for (int i = 0; i < player->getLives(); i++) {
-		sp.setPosition(sf::Vector2f(window_W - 130.f + i * 35.f, 10.f));
+		sp.setPosition(sf::Vector2f((float)window_W - 130.f + i * 35.f, 10.f));
 		window->draw(sp);
 	}
 
@@ -174,14 +199,17 @@ void Game::processEvents()
 {
 	sf::Event e;
 	while (window->pollEvent(e)) {
+		if (gameOver)
+			continue;
+
 		if (e.type == sf::Event::Closed)
 			window->close();
 		if ((e.type == sf::Event::KeyReleased) && (e.key.code == sf::Keyboard::Escape))
 			paused = !paused;
 
-		if (paused) {
+		if (paused)
 			continue;
-		}
+
 		if (e.type == sf::Event::KeyReleased && e.key.code == sf::Keyboard::Space) {
 			player->shoot([this](Projectile* p) {
 				playerProjectiles.push_back(p);
@@ -194,7 +222,7 @@ void Game::initializeText()
 {
 	font.loadFromFile("assets/fonts/space_invaders.ttf");
 	sf::Text* pausedText = new sf::Text("PAUSED", font, 24);
-	pausedText->setPosition(sf::Vector2f(window_W / 2.f - pausedText->getGlobalBounds().width / 2.f + .5f, window_H / 2.f - pausedText->getGlobalBounds().height));
+	pausedText->setPosition(sf::Vector2f((float)window_W / 2.f - pausedText->getGlobalBounds().width / 2.f + .5f, (float)window_H / 2.f - pausedText->getGlobalBounds().height));
 	pausedText->setFillColor(sf::Color::Transparent);
 	texts["paused"] = pausedText;
 
@@ -213,15 +241,22 @@ void Game::initializeText()
 	texts["lives_text"] = livesText;
 
 	sf::Text* gameOverText = new sf::Text("GAME OVER", font, 24);
-	gameOverText->setPosition(sf::Vector2f(window_W / 2.f - gameOverText->getGlobalBounds().width / 2.f + .5f, window_H / 2.f - gameOverText->getGlobalBounds().height));
+	gameOverText->setPosition(sf::Vector2f((float)window_W / 2.f - gameOverText->getGlobalBounds().width / 2.f + .5f, (float)window_H / 2.f - gameOverText->getGlobalBounds().height));
 	gameOverText->setFillColor(sf::Color::Transparent);
 	texts["game_over"] = gameOverText;
+
+	sf::Text* restartText = new sf::Text("RESTART", font, 16);
+	restartText->setPosition(sf::Vector2f((float)window_W / 2.f - restartText->getGlobalBounds().width / 2.f, (float)window_H / 2.f - restartText->getGlobalBounds().height + 40.f));
+	restartText->setFillColor(sf::Color::Transparent);
+	texts["restart_text"] = restartText;
 }
 
 void Game::setupLevel()
 {
 	playerProjectiles = std::vector<Projectile*>();
 	alienProjectiles = std::vector<Projectile*>();
+	aliens = std::vector<Alien*>();
+	walls = std::vector<Wall*>();
 
 	// Add Player
 	player = new Player(sf::Vector2f((float)window_W / 2, (float)window_H - 50), &atlas);
@@ -529,4 +564,21 @@ void Game::initializeLevel(float deltaTime)
 			}
 		}
 	}
+}
+
+bool Game::clickedRestart()
+{
+	return texts["restart_text"]->getGlobalBounds().contains((sf::Vector2f)sf::Mouse::getPosition(*window)) && sf::Mouse::isButtonPressed(sf::Mouse::Left);
+}
+
+sf::RectangleShape Game::createTextBorder(sf::FloatRect bounds, sf::Color borderColor, float borderWidth)
+{
+	sf::RectangleShape rect;
+	rect.setPosition(sf::Vector2f(bounds.left - 5.f, bounds.top - 5.f));
+	rect.setSize(sf::Vector2f(bounds.width + 10.f, bounds.height + 10.f));
+	rect.setFillColor(sf::Color::Transparent);
+	rect.setOutlineColor(borderColor);
+	rect.setOutlineThickness(borderWidth);
+
+	return rect;
 }
